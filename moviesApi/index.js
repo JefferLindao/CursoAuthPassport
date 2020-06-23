@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const { config } = require('./config/index')
 const moviesApi = require('./routes/movies.js')
+const userMovieApi = require('./routes/userMovies')
 
 const { errorHandler, logErrors, wrapError } = require('./utils/middleware/errorHandlers')
 
@@ -12,6 +13,7 @@ app.use(express.json())
 
 // routes
 moviesApi(app)
+userMovieApi(app)
 
 // Catch 404
 app.use(notFoundHandler)
