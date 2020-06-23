@@ -1,3 +1,6 @@
 jwt-utilities/node_modules/
 handlerSession/node_modules/
 .vscode/
+moviesApi/node_modules/
+moviesApi/.nyc_output
+moviesApi/.env
