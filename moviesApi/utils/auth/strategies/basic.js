@@ -15,10 +15,8 @@ passport.use(
       if (!user) {
         return cb(boom.unauthorized(), false)
       }
-      const hash = await bcrypt.hash(user.password, 10)
-      const match = await bcrypt.compare(password, hash)
 
-      if (!match) {
+      if (!(await bcrypt.compare(password, user.password))) {
         return cb(boom.unauthorized(), false)
       }
       delete user.password

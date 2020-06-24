@@ -33,7 +33,7 @@ async function createUser(mongoDB, user) {
   const userId = await mongoDB.create('user', {
     name,
     email,
-    password, hashedPassword,
+    password: hashedPassword,
     isAdmin: Boolean(isAdmin)
   })
   return userId
