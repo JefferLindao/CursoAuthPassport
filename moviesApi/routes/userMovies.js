@@ -6,7 +6,10 @@ const validationHandler = require('../utils/middleware/validatiionHandler')
 const { movieIdSchema } = require('../utils/schemas/movies')
 const { userIdSchema } = require('../utils/schemas/users')
 const { createUserMovieSchema } = require('../utils/schemas/userMovies')
+const passport = require('passport')
 
+// JWT strategy
+require('../utils/auth/strategies/jwt')
 
 function userMoviesApi(app) {
   const route = express.Router()
@@ -14,7 +17,7 @@ function userMoviesApi(app) {
 
   const userMoviesService = new UserMoviesService()
 
-  route.get('/', validationHandler({ userId: userIdSchema }, 'query'), async function (req, res, next) {
+  route.get('/', validationHandler({ userId: userIdSchema }, 'query'), passport.authenticate('jwt', { session: false }), async function (req, res, next) {
     const { userId } = req.query
     try {
       const userMovies = await userMoviesService.getUserMovies({ userId })
