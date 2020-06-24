@@ -3,6 +3,7 @@ const app = express()
 const { config } = require('./config/index')
 const moviesApi = require('./routes/movies.js')
 const userMovieApi = require('./routes/userMovies')
+const authApi = require('./routes/auth.js')
 
 const { errorHandler, logErrors, wrapError } = require('./utils/middleware/errorHandlers')
 
@@ -10,8 +11,10 @@ const notFoundHandler = require('./utils/middleware/notFoundHandler')
 
 // body parser
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
 // routes
+authApi(app)
 moviesApi(app)
 userMovieApi(app)
 

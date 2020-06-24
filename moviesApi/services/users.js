@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt')
 
 class UserService {
   constructor() {
-    this.collection = 'users'
+    this.collection = 'user'
     this.mongoDB = new MongoLib()
   }
 
