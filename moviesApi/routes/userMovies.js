@@ -2,6 +2,7 @@ const express = require('express')
 
 const UserMoviesService = require('../services/userMovies')
 const validationHandler = require('../utils/middleware/validatiionHandler')
+const scopeValidationHandler = require('../utils/middleware/scopeValidationHander')
 
 const { movieIdSchema } = require('../utils/schemas/movies')
 const { userIdSchema } = require('../utils/schemas/users')
@@ -17,37 +18,50 @@ function userMoviesApi(app) {
 
   const userMoviesService = new UserMoviesService()
 
-  route.get('/', validationHandler({ userId: userIdSchema }, 'query'), passport.authenticate('jwt', { session: false }), async function (req, res, next) {
-    const { userId } = req.query
-    try {
-      const userMovies = await userMoviesService.getUserMovies({ userId })
+  route.get('/',
+    passport.authenticate('jwt', { session: false }),
+    scopeValidationHandler(['read:user-movies']),
+    validationHandler({ userId: userIdSchema }, 'query'),
+    async function (req, res, next) {
+      const { userId } = req.query
+      try {
+        const userMovies = await userMoviesService.getUserMovies({ userId })
 
-      res.status(200).json({
-        data: userMovies,
-        message: 'user movie listed'
-      })
-    } catch (error) {
-      next(error)
+        res.status(200).json({
+          data: userMovies,
+          message: 'user movie listed'
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
-  route.post('/', validationHandler(createUserMovieSchema), async function (req, res, next) {
-    const { body: userMovies } = req
-    try {
-      const createUserMovieId = await userMoviesService.createUserMovie({
-        userMovie
-      })
+  route.post('/',
+    passport.authenticate('jwt', { session: false }),
+    scopeValidationHandler(['create: user-movies']),
+    validationHandler(createUserMovieSchema),
+    async function (req, res, next) {
+      const { body: userMovies } = req
+      try {
+        const createUserMovieId = await userMoviesService.createUserMovie({
+          userMovie
+        })
 
-      res.status(201).json({
-        data: createUserMovieId,
-        message: 'user movie created'
-      })
-    } catch (error) {
-      next(error)
+        res.status(201).json({
+          data: createUserMovieId,
+          message: 'user movie created'
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
-  route.delete('/:userMovieId', validationHandler({ userMovieId: movieIdSchema }, 'params'),
+  route.delete('/:userMovieId',
+    passport.authenticate('jwt', { session: false }),
+    scopeValidationHandler(['delete:user-movies']),
+    validationHandler({ userMovieId: movieIdSchema }, 'params'),
     async function (req, res, next) {
       const { userMovieId } = req.params
       try {
