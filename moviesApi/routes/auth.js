@@ -6,7 +6,7 @@ const ApiKeysService = require('../services/apiKeys')
 const UsersService = require('../services/users')
 const validationHandler = require('../utils/middleware/validatiionHandler')
 
-const { createUserSchema } = require('../utils/schemas/users')
+const { createUserSchema, createProviderUserSchema } = require('../utils/schemas/users')
 
 const { config } = require('../config')
 
@@ -20,8 +20,8 @@ function authApi(app) {
   const usersService = new UsersService()
 
   router.post('/sign-in', async function (req, res, next) {
-    const { apiKeyToken } = req.body
-    if (!apiKeyToken) {
+    const { apikeyToken } = req.body
+    if (!apikeyToken) {
       next(boom.unauthorized('apikeytoken is required'))
     }
 
@@ -35,7 +35,7 @@ function authApi(app) {
           if (error) {
             next(error)
           }
-          const apiKey = await apiKeysService.getApiKey({ token: apiKeyToken })
+          const apiKey = await apiKeysService.getApiKey({ token: apikeyToken })
           if (!apiKey) {
             next(boom.unauthorized())
           }
@@ -70,6 +70,40 @@ function authApi(app) {
       next(error)
     }
   })
+
+  router.post('/sign-provider', validationHandler(createProviderUserSchema),
+    async function (req, res, next) {
+      const { body } = req
+      const { apikeyToken, ...user } = body
+
+      if (!apikeyToken) {
+        next(boom.unauthorized('apikeyToken is required'))
+      }
+
+      try {
+        const queriedUser = await usersService.getOrCreateUser({ user })
+        const apiKey = await apiKeysService.getApiKey({ token: apikeyToken })
+
+        if (!apiKey) {
+          next(boom.unauthorized())
+        }
+        const { _id: id, name, email } = queriedUser
+
+        const payload = {
+          sub: id,
+          name,
+          email,
+          scopes: apiKey.scopes
+        }
+        const token = jwt.sign(payload, config.authJwtSecret, {
+          expiresIn: '15m'
+        })
+
+        return res.status(200).json({ token, user: { id, name, email } })
+      } catch (error) {
+        next(error)
+      }
+    })
 }
 
 module.exports = authApi
