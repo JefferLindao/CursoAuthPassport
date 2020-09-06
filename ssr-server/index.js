@@ -9,6 +9,7 @@ const app = express()
 app.use(express.json())
 app.use(cookieParse())
 require('./utils/strategies/basic')
+require('./utils/strategies/oauth')
 
 const THIRTY_DAYS_IN_SEC = 2592000
 const TWO_HOURS_IN_SEC = 7200
@@ -107,6 +108,26 @@ app.delete("/user-movies/:userMovieId", async function (req, res, next) {
     next(error)
   }
 })
+
+app.get("/auth/google-oauth", passport.authenticate("google-oauth", {
+  scope: ['email', 'profile', 'openid']
+}))
+
+app.get("/auth/google-oauth/callback", passport.authenticate("google-oauth", { session: false }),
+  function (req, res, next) {
+    if (!req.user) {
+      next(boom.unauthorized())
+    }
+
+    const { token, ...user } = req.user
+
+    res.cookie("token", token, {
+      httpOnly: !config.dev,
+      secure: !config.dev
+    })
+
+    res.status(200).json(user)
+  })
 
 app.listen(config.port, function () {
   console.log(`Listening http://localhost:${config.port}`)
