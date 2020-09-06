@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 const { config } = require('./config/index')
 const moviesApi = require('./routes/movies.js')
-const userMovieApi = require('./routes/userMovies')
+const userMovieApi = require('./routes/userMovies.js')
 const authApi = require('./routes/auth.js')
 
 const { errorHandler, logErrors, wrapError } = require('./utils/middleware/errorHandlers')

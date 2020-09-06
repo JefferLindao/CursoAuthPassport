@@ -39,10 +39,10 @@ function userMoviesApi(app) {
 
   route.post('/',
     passport.authenticate('jwt', { session: false }),
-    scopeValidationHandler(['create: user-movies']),
+    scopeValidationHandler(['create:user-movies']),
     validationHandler(createUserMovieSchema),
     async function (req, res, next) {
-      const { body: userMovies } = req
+      const { body: userMovie } = req
       try {
         const createUserMovieId = await userMoviesService.createUserMovie({
           userMovie
