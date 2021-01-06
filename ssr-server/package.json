@@ -12,7 +12,7 @@
   "dependencies": {
     "@hapi/boom": "^7.4.11",
     "@types/hapi__boom": "^9.0.1",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
